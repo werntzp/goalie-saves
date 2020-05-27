@@ -1,17 +1,16 @@
 import "package:flutter/material.dart";
 import "game_screen.dart";
+import "shared.dart";
 
 void main() => runApp(StatsApp());
 
 class StatsApp extends StatelessWidget {
 
-  final String _title = "Goalie saves!";
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: _title,
-      home: new GameScreen(title: _title),
+      title: APP_TITLE,
+      home: new GameScreen(),
     );
   }
 }

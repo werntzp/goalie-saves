@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 
-enum enumTeamType { ours, theirs }
+const APP_TITLE = "Goalie Saves!";
+
+enum enumTeamType { home, away }
 enum enumGoalType { es, pp, en, sh, ps }
 enum enumPeriodType { one, two, three, ot, so }
 

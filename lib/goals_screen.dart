@@ -74,7 +74,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     }
 
     // create a goal object to pass back  
-    Goal g = new Goal(_goalType, enumTeamType.ours, _time, p, _players);
+    Goal g = new Goal(_goalType, enumTeamType.home, _time, p, _players);
     Navigator.pop(context, g);
 
   }

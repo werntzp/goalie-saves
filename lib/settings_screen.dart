@@ -106,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         else {
           _isSwitched = false;
         }
-
+        
         _myList();
 
       }
