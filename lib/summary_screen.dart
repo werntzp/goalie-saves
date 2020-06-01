@@ -19,20 +19,22 @@ class SummaryScreen extends StatelessWidget{
             children: <Widget>[
               Padding(padding: const EdgeInsets.all(12.0),),
               Text("1st Period", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
+              Text("Shots", style: TextStyle(fontWeight: FontWeight.bold)),
               Table(
                 border: TableBorder.all(),
                 children: [
                   TableRow(
                     children: [
-                      Column(children: <Widget>[Text("Our Team")],),
+                      Column(children: <Widget>[Text("Home")],),
                       Column(children: <Widget>[Text("12")],),
-                      Column(children: <Widget>[Text("Their Team")],),
+                      Column(children: <Widget>[Text("away")],),
                       Column(children: <Widget>[Text("7")],),                    
                     ]
                   ), 
                 ],
               ),
               Padding(padding: const EdgeInsets.all(12.0),),
+              Text("Goals", style: TextStyle(fontWeight: FontWeight.bold)),
               Table(
                 border: TableBorder.all(),
                 children: [
@@ -41,73 +43,22 @@ class SummaryScreen extends StatelessWidget{
                       Column(children: <Widget>[Text("Time")],),
                       Column(children: <Widget>[Text("Team")],),
                       Column(children: <Widget>[Text("Type")],),
-                      Column(children: <Widget>[Text("Players on ice")],),                    
                     ]
                   ), 
                 ],
               ),
               Padding(padding: const EdgeInsets.all(12.0),),
               Text("2nd Period", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-              Table(
-                border: TableBorder.all(),
-                children: [
-                  TableRow(
-                    children: [
-                      Column(children: <Widget>[Text("Our Team")],),
-                      Column(children: <Widget>[Text("12")],),
-                      Column(children: <Widget>[Text("Their Team")],),
-                      Column(children: <Widget>[Text("7")],),                    
-                    ]
-                  ), 
-                ],
-              ),
               Padding(padding: const EdgeInsets.all(12.0),),
               Text("3rd Period", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-              Table(
-                border: TableBorder.all(),
-                children: [
-                  TableRow(
-                    children: [
-                      Column(children: <Widget>[Text("Our Team")],),
-                      Column(children: <Widget>[Text("12")],),
-                      Column(children: <Widget>[Text("Their Team")],),
-                      Column(children: <Widget>[Text("7")],),                    
-                    ]
-                  ), 
-                ],
-              ),              Padding(padding: const EdgeInsets.all(12.0),),
+              Padding(padding: const EdgeInsets.all(12.0),),
               Text("Overtime", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-              Table(
-                border: TableBorder.all(),
-                children: [
-                  TableRow(
-                    children: [
-                      Column(children: <Widget>[Text("Our Team")],),
-                      Column(children: <Widget>[Text("12")],),
-                      Column(children: <Widget>[Text("Their Team")],),
-                      Column(children: <Widget>[Text("7")],),                    
-                    ]
-                  ), 
-                ],
-              ),              Padding(padding: const EdgeInsets.all(12.0),),
-              Text("Shootout", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-              Table(
-                border: TableBorder.all(),
-                children: [
-                  TableRow(
-                    children: [
-                      Column(children: <Widget>[Text("Our Team")],),
-                      Column(children: <Widget>[Text("12")],),
-                      Column(children: <Widget>[Text("Their Team")],),
-                      Column(children: <Widget>[Text("7")],),                    
-                    ]
-                  ), 
+              Padding(padding: const EdgeInsets.all(12.0),),
+              Text("Shootout", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),)
                 ],
               ),
-            ],
           )
         )
-      )
     );
-    }
+  }
 }

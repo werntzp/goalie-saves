@@ -3,23 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import "package:shared_preferences/shared_preferences.dart";
 import "package:path_provider/path_provider.dart";
 import "dart:io";
+import "shared.dart";
 
 // class used to populate the listview 
-class MyItem extends StatelessWidget {
-  final int title;
-  final VoidCallback onDelete;
-
-  MyItem(this.title, {this.onDelete});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      dense: true,
-      title: Text(title.toString()),
-      onLongPress: this.onDelete,
-    );
-  }
-}
 
 // main class 
 class SettingsScreen extends StatefulWidget{
@@ -32,93 +18,73 @@ class SettingsScreen extends StatefulWidget{
 
 class _SettingsScreenState extends State<SettingsScreen> {
 
-  final textController = TextEditingController();
-  final playerController = TextEditingController();
-  String _ourTeamName = "";
-  String _logo = "images/opp_logo.png"; 
-  String _file = "logo.png";
-  String _labelText = "Player number";
-  File _imageFile;
+  final homeTeamController = TextEditingController();
+  final awayTeamController = TextEditingController();
+  File _homeLogoFile;
+  File _awayLogoFile;
   String _path = "";
   Directory _directory; 
-  List<int> _players = <int>[];
   bool _isSwitched = false;
+  String _homeTeamName = "Team 1";
+  String _awayTeamName = "Team 2";
 
-  // get a handle to the logo file
-  Future<File> get _logoFile async {
-    return File("$_path/$_file");
+  // get a handle to the home team's logo
+  Future<File> get _getHomeTeamlogoFile async {
+    return File("$_path/$HOME_TEAM_LOGO");
   }
 
-  // do we have a number?
-  bool _isNumeric(String s) {
-    if (s == null) {
-      return false;
-    }
-    return int.tryParse(s) != null;
+  // get a handle to the away team's logo
+  Future<File> get _getAwayTeamlogoFile async {
+    return File("$_path/$AWAY_TEAM_LOGO");
   }
 
-  // add new jersey numbers to the list 
-  void _addItemToList(){
-    setState(() {
-      Text txt = Text(playerController.text);
-      String str = txt.data;
-      if (_isNumeric(str)) {
-        _players.insert(0, int.tryParse(str));
-        playerController.clear();
-      }
-      
-    });
-  }
-
-  // load custom name and/or logo 
+  // load any custom details 
   void _load() async {
-    String extraGoalInfo = "no";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _directory = await getApplicationDocumentsDirectory();
     _path = _directory.path;
+    String extra = "no";
 
-    if (await File("$_path/$_file").exists() == true) {
-      _imageFile = await _logoFile;
+    // home team logo 
+    if (await File("$_path/$HOME_TEAM_LOGO").exists() == true) {
+      _homeLogoFile = await _getHomeTeamlogoFile;
     }
     else {
-      _imageFile = null;
+      _homeLogoFile = null;
     }
 
-    setState(() {
-      _ourTeamName = (prefs.getString("teamname") ?? "Our Team");
-      String tmp = (prefs.getString("players") ?? "");
-      if (tmp.length > 1) {
-        _players.clear();
-        List<String> lst = tmp.split(";");
-        for (var i = 0; i < lst.length; i++) {
-          try {
-            _players.add(int.parse(lst[i]));
-          }
-          on Exception catch (e) {
-            // parsing error 
-            print("error caught trying to parse: $e");
-          }        
-        }
-        extraGoalInfo = (prefs.getString("extra") ?? "no");
-        if (extraGoalInfo == "yes") {
-          _isSwitched = true;
-        }
-        else {
-          _isSwitched = false;
-        }
-        
-        _myList();
+    // away team logo 
+    if (await File("$_path/$AWAY_TEAM_LOGO").exists() == true) {
+      _awayLogoFile = await _getAwayTeamlogoFile;
+    }
+    else {
+      _awayLogoFile = null;
+    }
 
+    // are we asking for extra goal info (time and players on ice)?
+    extra = (prefs.getString("extra") ?? "no");
+
+    setState(() {
+      // custom team names (if set)
+      _homeTeamName = (prefs.getString("home_team_name") ?? "Team 1");
+      _awayTeamName = (prefs.getString("away_team_name") ?? "Team 2");
+      // if asking for extra info, set boolean flag 
+      if (extra == "yes") {
+        _isSwitched = true;
+      }
+      else {
+        _isSwitched = false;
       }
     });
   }
 
-  // save the new team name and/or logo (if they selected a new one)
+  // save the team names and/or logos 
   void _save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Text teamName = Text(textController.text);
-    String name = teamName.data;
-    var concatenate = StringBuffer();
+    Text tempHomeTeamName = Text(homeTeamController.text);
+    Text tempAwayTeamName = Text(awayTeamController.text);
+    String homeName = tempHomeTeamName.data;
+    String awayName = tempAwayTeamName.data;
     String extra = "";
 
     if (_isSwitched) {
@@ -129,22 +95,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     prefs.setString("extra", extra);
 
-    if (name == "") {
-      name = _ourTeamName;
+    // custom home team name 
+    if (homeName == "") {
+      homeName = _homeTeamName;
     }
-    prefs.setString("teamname", name);
+    prefs.setString("home_team_name", homeName);
 
-    // did they choose a new image?  
-    if (_imageFile != null) {
+    // custom away team name 
+    if (awayName == "") {
+      awayName = _awayTeamName;
+    }
+    prefs.setString("away_team_name", awayName);
+
+    // custom home team logo   
+    if (_homeLogoFile != null) {
       try {
-        await File("$_path/$_file").delete();
+        await File("$_path/$HOME_TEAM_LOGO").delete();
       }
       on Exception catch (e) {
         // do nothing; probably no file to delete 
         print("error caught trying to delete file: $e");
       }
       try {
-        _imageFile.copy("$_path/$_file");
+        await _homeLogoFile.copy("$_path/$HOME_TEAM_LOGO");
       }
       on Exception catch (e) {
         // do nothing; probably no file to delete 
@@ -152,13 +125,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     }
 
-    // did they select players?
-    if (_players.length > 0) {
-      _players.forEach((item){
-        concatenate.write(item);
-        concatenate.write(";");
-      });
-      prefs.setString("players", concatenate.toString());
+    // custom away team logo   
+    if (_awayLogoFile != null) {
+      try {
+        await File("$_path/$AWAY_TEAM_LOGO").delete();
+      }
+      on Exception catch (e) {
+        // do nothing; probably no file to delete 
+        print("error caught trying to delete file: $e");
+      }
+      try {
+        await _awayLogoFile.copy("$_path/$AWAY_TEAM_LOGO");
+      }
+      on Exception catch (e) {
+        // do nothing; probably no file to delete 
+        print("error caught trying to copy file: $e");
+      }
     }
 
     // go back 
@@ -166,90 +148,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   }
 
-  // get the image from the image picker 
-  Future _pickImage() async {
+  // home team image logo picker  
+  Future _pickHomeImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       setState(() {
-        _imageFile = image;
+        _homeLogoFile = image;
       });
     }
   }
 
-  // return a listview 
-  Widget _myList() {
-      if (_isSwitched) { 
-        return Column(
-          children: <Widget>[
-              Text("Players", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                    color: Colors.black,
-                    width: 1,
-                  ),
-                ),
-                child: ConstrainedBox(
-                  constraints: new BoxConstraints(
-                    maxHeight: 175.0,
-                  ),
-                  child: ListView.builder(
-                        shrinkWrap: false,
-                        itemCount: _players.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return MyItem(_players[index], onDelete: () => removeItem(index));
-                        },
-                      )
-                ),
-              ),
-              Padding(padding: const EdgeInsets.all(2.0),),
-              Row(
-                  children: <Widget>[
-                    Container(
-                      width: 150.0,
-                      height: 38.0,
-                      child: TextField(
-                        controller: playerController,  
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: _labelText,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10,),
-                    RaisedButton(
-                      child: Text("Add"),
-                      onPressed: _addItemToList,
+  // home team image logo picker  
+  Future _pickAwayImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
-                    ),
-                  ],
-                ),
-          ],
-        );  
-      }
-      else {
-        return Padding(padding: const EdgeInsets.all(129.0),);
-
-      }
-  }
-
-  // decide whether to fill the logo image with the default one, 
-  // or a user selected image 
-  Widget _teamLogo() {
-    if (_imageFile == null) {
-      return Image.asset("$_logo", width: 100, height: 100,);
-    } else {
-      imageCache.clear();
-      return Image.file(_imageFile, width: 100, height: 100,);
+    if (image != null) {
+      setState(() {
+        _awayLogoFile = image;
+      });
     }
   }
 
-  void removeItem(int index) {
-    setState(() {
-      _players = List.from(_players)
-        ..removeAt(index);
-    });
+  // render image for home team  
+  Widget _homeTeamLogo() {
+    if (_homeLogoFile == null) {
+      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
+    } else {
+      imageCache.clear();
+      return Image.file(_homeLogoFile, width: 100, height: 100,);
+    }
+  }
+
+  // render image for away team  
+  Widget _awayTeamLogo() {
+    if (_awayLogoFile == null) {
+      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
+    } else {
+      imageCache.clear();
+      return Image.file(_awayLogoFile, width: 100, height: 100,);
+    }
   }
 
   // override the init function to see if there's anything custom stored  
@@ -262,8 +200,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // release the controller resources 
   @override
   void dispose() {
-    textController.dispose();
-    playerController.dispose();
+    homeTeamController.dispose();
+    awayTeamController.dispose();
     super.dispose();
   }
 
@@ -281,31 +219,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start, 
               children: <Widget>[
                 Padding(padding: const EdgeInsets.all(8.0),),
-                Text("Team name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
+                Text("Home Team Name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
                 Container(
-                  height: 38.0,
+                  height: 60.0,
                   child: TextField(
-                      controller: textController,
+                      maxLength: 12,
+                      controller: homeTeamController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                      labelText: "$_ourTeamName",
+                      labelText: "$_homeTeamName",
+                    ),
+                  ),
+                ),
+                Padding(padding: const EdgeInsets.all(8.0),),
+                Text("Home Team Logo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
+                GestureDetector(
+                  onTap: _pickHomeImage,
+                  child: FittedBox(
+                    fit: BoxFit.fill,
+                    child: _homeTeamLogo(),
+                  ),
+                ),
+                Padding(padding: const EdgeInsets.all(8.0),),
+                Text("Away Team Name", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
+                Container(
+                  height: 60.0,
+                  child: TextField(
+                      maxLength: 12,
+                      controller: awayTeamController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      labelText: "$_awayTeamName",
                     ),
                   ),
                 ),
                 Padding(padding: const EdgeInsets.all(8.0),),
                 Text("Team logo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
                 GestureDetector(
-                  onTap: _pickImage,
+                  onTap: _pickAwayImage,
                   child: FittedBox(
                     fit: BoxFit.fill,
-                    child: _teamLogo(),
+                    child: _awayTeamLogo(),
                   ),
                 ),
                 Padding(padding: const EdgeInsets.all(5.0),),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text("Extra goal info", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),  
+                    Text("Capture Goal Details", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),  
                     Padding(padding: const EdgeInsets.all(2.0),),
                     Switch(
                       value: _isSwitched,
@@ -317,9 +278,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ]
                 ),
-                Text("Capture time of goal, goal type, and players on the ice.", style: TextStyle(fontSize: 15),),  
-                Padding(padding: const EdgeInsets.all(8.0),),
-                _myList(),
+                Text("Time of goal and goal type.", style: TextStyle(fontSize: 15),),  
                 Padding(padding: const EdgeInsets.all(12.0),),
                 Center(
                   child: FloatingActionButton(heroTag: "fab8", onPressed: _save, backgroundColor: Colors.black, tooltip: "Save", mini: true, child: Icon(Icons.save)),

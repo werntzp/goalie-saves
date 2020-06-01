@@ -5,7 +5,6 @@ import "package:shared_preferences/shared_preferences.dart";
 import "package:path_provider/path_provider.dart";
 import "dart:io";
 import "shared.dart";
-import "summary_screen.dart";
 
 class GameScreen extends StatefulWidget{
   GameScreen({Key key}) : super(key: key);
@@ -17,11 +16,6 @@ class GameScreen extends StatefulWidget{
 
 class _GameScreenState extends State<GameScreen> {
 
-  static const int GOALS = 0;
-  static const int SHOTS = 1; 
-  static const int UP = 0;
-  static const int DOWN = 1;
-  final String _defaultLogo = "images/opp_logo.png";
   enumPeriodType _period = enumPeriodType.one;
   int _homeGoals = 0;
   int _awayGoals = 0;
@@ -36,12 +30,12 @@ class _GameScreenState extends State<GameScreen> {
   String _displayPeriod = "1";
   String _path = "";
   Directory _directory; 
-  String _homeLogoName = "home_logo.png";
-  String _awayLogoName = "away_logo.png";
   File _homeLogoFile;
   File _awayLogoFile;
   List<Goal> _goals = <Goal>[];
   bool _isSwitched = false;
+  Map<enumPeriodType, int> _homeShotsMap = {enumPeriodType.one: 0, enumPeriodType.two: 0, enumPeriodType.three: 0, enumPeriodType.ot: 0, enumPeriodType.so: 0};
+  Map<enumPeriodType, int> _awayShotsMap = {enumPeriodType.one: 0, enumPeriodType.two: 0, enumPeriodType.three: 0, enumPeriodType.ot: 0, enumPeriodType.so: 0};
 
   // don't get goals or shots go above 99 or below 0 
   int restrictNumber(direction, counter) {
@@ -64,6 +58,7 @@ class _GameScreenState extends State<GameScreen> {
   // clear out all the values 
   void _reset() {
     setState(() {
+      // clear all the vars
       _homeGoals = 0;
       _awayGoals = 0;
       _homeShots = 0;
@@ -72,24 +67,36 @@ class _GameScreenState extends State<GameScreen> {
       _awaySvg = 100.00;
       _homeDisplaySvg = "100.00";
       _awayDisplaySvg = "100.00"; 
+      // reset the maps
+      _homeShotsMap[enumPeriodType.one] = 0;
+      _homeShotsMap[enumPeriodType.two] = 0;
+      _homeShotsMap[enumPeriodType.three] = 0;
+      _homeShotsMap[enumPeriodType.ot] = 0;
+      _homeShotsMap[enumPeriodType.so] = 0;
+      _awayShotsMap[enumPeriodType.one] = 0;
+      _awayShotsMap[enumPeriodType.two] = 0;
+      _awayShotsMap[enumPeriodType.three] = 0;
+      _awayShotsMap[enumPeriodType.ot] = 0;
+      _awayShotsMap[enumPeriodType.so] = 0;
+
     }
     );    
   }
 
   // get a handle to the home team's logo
   Future<File> get _getHomeTeamlogoFile async {
-    return File("$_path/$_homeLogoName");
+    return File("$_path/$HOME_TEAM_LOGO");
   }
 
   // get a handle to the away team's logo
   Future<File> get _getAwayTeamlogoFile async {
-    return File("$_path/$_awayLogoName");
+    return File("$_path/$AWAY_TEAM_LOGO");
   }
 
   // if no custom logo, use default one for home team 
   Widget _homeTeamLogo() {
     if (_homeLogoFile == null) {
-      return Image.asset("$_defaultLogo", width: 100, height: 100,);
+      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
     } else {
       imageCache.clear();
       return Image.file(_homeLogoFile, width: 100, height: 100,);
@@ -98,8 +105,8 @@ class _GameScreenState extends State<GameScreen> {
 
   // if no custom logo, use default one for away team 
   Widget _awayTeamLogo() {
-    if (_homeLogoFile == null) {
-      return Image.asset("$_defaultLogo", width: 100, height: 100,);
+    if (_awayLogoFile == null) {
+      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
     } else {
       imageCache.clear();
       return Image.file(_awayLogoFile, width: 100, height: 100,);
@@ -114,7 +121,7 @@ class _GameScreenState extends State<GameScreen> {
     String extra = "no";
 
     // home team logo 
-    if (await File("$_path/$_homeLogoName").exists() == true) {
+    if (await File("$_path/$HOME_TEAM_LOGO").exists() == true) {
       _homeLogoFile = await _getHomeTeamlogoFile;
     }
     else {
@@ -122,7 +129,7 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     // away team logo 
-    if (await File("$_path/$_homeLogoName").exists() == true) {
+    if (await File("$_path/$AWAY_TEAM_LOGO").exists() == true) {
       _awayLogoFile = await _getAwayTeamlogoFile;
     }
     else {
@@ -201,11 +208,7 @@ class _GameScreenState extends State<GameScreen> {
 
   // go to the game summary screen
   void _gameSummary() async {
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SummaryScreen()),
-    );
+    Navigator.pushNamed(context, "/summary", arguments: new Summary(_homeShotsMap, _awayShotsMap, _goals));
 
   }
 
@@ -238,9 +241,25 @@ class _GameScreenState extends State<GameScreen> {
 
   // as goals or shots change, update the goalie's save percentage
   void _updateSavePercentage() {
-    _homeSvg = ((_awayShots - _awayGoals) / _awayShots) * 100.00;
+    int tmpHomeShots = 0;
+    int tmpAwayShots = 0;
+
+    if (_awayShots == 0) {
+      tmpAwayShots = 1;
+    }
+    else {
+      tmpAwayShots = _awayShots;
+    }
+    if (_homeShots == 0) {
+      tmpHomeShots = 1;
+    }
+    else {
+      tmpHomeShots = _homeShots;
+    }
+
+    _homeSvg = ((tmpAwayShots - _awayGoals) / tmpAwayShots) * 100.00;
     _homeDisplaySvg = _homeSvg.toStringAsFixed(2);
-    _awaySvg = ((_homeShots - _homeGoals) / _homeShots) * 100.00;
+    _awaySvg = ((tmpHomeShots - _homeGoals) / tmpHomeShots) * 100.00;
     _awayDisplaySvg = _awaySvg.toStringAsFixed(2);
 
   }
@@ -249,24 +268,31 @@ class _GameScreenState extends State<GameScreen> {
   void _incrementHomeShots() {
     _update(enumTeamType.home, SHOTS, UP);
   }
+
   void _decrementHomeShots() {
     _update(enumTeamType.home, SHOTS, DOWN);
   }
+
   void _addHomeGoalSimple() {
     _update(enumTeamType.home, GOALS, UP);
   }
+
   void _decrementHomeGoals() {
     _update(enumTeamType.home, GOALS, DOWN);
   }
+
   void _incrementAwayShots() {
     _update(enumTeamType.away, SHOTS, UP);
   }
+
   void _decrementAwayShots() {
     _update(enumTeamType.away, SHOTS, DOWN);
   }
+
   void _addAwayGoalSimple() {
     _update(enumTeamType.away, GOALS, UP);
   }
+
   void _decrementAwayGoals() {
     _update(enumTeamType.away, GOALS, DOWN);
   }
@@ -290,11 +316,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // update number of shots or goals  
-  void _update(who, what, direction) {
+  void _update(enumTeamType who, int what, int direction) {
     setState(() {
 
       if ((who == enumTeamType.home) & (what == SHOTS)) {
         _homeShots = restrictNumber(direction, _homeShots);
+        _homeShotsMap[_period] = _homeShots;
       }
       else if ((who == enumTeamType.home) & (what == GOALS)) {
         _homeGoals = restrictNumber(direction, _homeGoals);
@@ -303,7 +330,7 @@ class _GameScreenState extends State<GameScreen> {
         }
         // add or remove goal from the list
         if (direction == UP) {
-          Goal g = new Goal(null, enumTeamType.home, null, _period, null);
+          Goal g = new Goal(null, who, null, _period);
           _goals.add(g);
         }
         else {
@@ -320,6 +347,7 @@ class _GameScreenState extends State<GameScreen> {
       }
       else if ((who == enumTeamType.away) & (what == SHOTS)) {
         _awayShots = restrictNumber(direction, _awayShots);
+        _awayShotsMap[_period] = _awayShots;
       }
       else {
         _awayGoals = restrictNumber(direction, _awayGoals);
@@ -327,7 +355,7 @@ class _GameScreenState extends State<GameScreen> {
           _awayShots = _awayGoals;
         }
         // add a new goal to the list
-        Goal g = new Goal(null, enumTeamType.away, null, _period, null);
+        Goal g = new Goal(null, who, null, _period);
         _goals.add(g);
       }
 
