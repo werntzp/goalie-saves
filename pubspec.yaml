@@ -1,5 +1,5 @@
 name: goaliesaves
-description: Record Goalie Saves
+description: Tendy Tracker
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -24,7 +24,8 @@ dependencies:
   path_provider: ^1.6.7
   flutter_time_picker_spinner: ^1.0.6+1
   flutter_launcher_icons: ^0.7.5
-  
+  intl: ^0.16.1
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

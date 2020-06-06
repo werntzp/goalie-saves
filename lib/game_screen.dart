@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import 'package:goaliesaves/summary_screen.dart';
 import "settings_screen.dart";
 import "goals_screen.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -67,6 +68,9 @@ class _GameScreenState extends State<GameScreen> {
       _awaySvg = 100.00;
       _homeDisplaySvg = "100.00";
       _awayDisplaySvg = "100.00"; 
+      _period = enumPeriodType.one;
+      _displayPeriod = "1";
+      _goals.clear();
       // reset the maps
       _homeShotsMap[enumPeriodType.one] = 0;
       _homeShotsMap[enumPeriodType.two] = 0;
@@ -208,7 +212,14 @@ class _GameScreenState extends State<GameScreen> {
 
   // go to the game summary screen
   void _gameSummary() async {
-    Navigator.pushNamed(context, "/summary", arguments: new Summary(_homeShotsMap, _awayShotsMap, _goals));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    Summary s = new Summary(_homeShotsMap, _awayShotsMap, _goals, prefs.getString("home_team_name"),prefs.getString("away_team_name"));
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) => SummaryScreen(
+           summary: s,
+        )),
+     );
 
   }
 
@@ -321,12 +332,13 @@ class _GameScreenState extends State<GameScreen> {
 
       if ((who == enumTeamType.home) & (what == SHOTS)) {
         _homeShots = restrictNumber(direction, _homeShots);
-        _homeShotsMap[_period] = _homeShots;
+        _homeShotsMap[_period] = _homeShotsMap[_period] + 1;
       }
       else if ((who == enumTeamType.home) & (what == GOALS)) {
         _homeGoals = restrictNumber(direction, _homeGoals);
         if (_homeShots < _homeGoals) {
           _homeShots = _homeGoals;
+          _homeShotsMap[_period] = _homeShotsMap[_period] + 1;
         }
         // add or remove goal from the list
         if (direction == UP) {
@@ -347,12 +359,13 @@ class _GameScreenState extends State<GameScreen> {
       }
       else if ((who == enumTeamType.away) & (what == SHOTS)) {
         _awayShots = restrictNumber(direction, _awayShots);
-        _awayShotsMap[_period] = _awayShots;
+        _awayShotsMap[_period] = _awayShotsMap[_period] + 1;
       }
       else {
         _awayGoals = restrictNumber(direction, _awayGoals);
         if (_awayShots < _awayGoals) {
           _awayShots = _awayGoals;
+          _awayShotsMap[_period] = _awayShotsMap[_period] + 1;
         }
         // add a new goal to the list
         Goal g = new Goal(null, who, null, _period);

@@ -22,6 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final awayTeamController = TextEditingController();
   File _homeLogoFile;
   File _awayLogoFile;
+  File _origHomeLogoFile;
+  File _origAwayLogoFile;
   String _path = "";
   Directory _directory; 
   bool _isSwitched = false;
@@ -48,17 +50,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // home team logo 
     if (await File("$_path/$HOME_TEAM_LOGO").exists() == true) {
       _homeLogoFile = await _getHomeTeamlogoFile;
+      _origHomeLogoFile = _homeLogoFile;
     }
     else {
       _homeLogoFile = null;
+      _origHomeLogoFile = null;
     }
 
     // away team logo 
     if (await File("$_path/$AWAY_TEAM_LOGO").exists() == true) {
       _awayLogoFile = await _getAwayTeamlogoFile;
+      _origAwayLogoFile = _awayLogoFile;
     }
     else {
       _awayLogoFile = null;
+      _origAwayLogoFile = null;
     }
 
     // are we asking for extra goal info (time and players on ice)?
@@ -108,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     prefs.setString("away_team_name", awayName);
 
     // custom home team logo   
-    if (_homeLogoFile != null) {
+    if ((_homeLogoFile != null) && (_homeLogoFile != _origHomeLogoFile)) {
       try {
         await File("$_path/$HOME_TEAM_LOGO").delete();
       }
@@ -126,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     // custom away team logo   
-    if (_awayLogoFile != null) {
+    if ((_awayLogoFile != null) && (_awayLogoFile != _origAwayLogoFile)) {
       try {
         await File("$_path/$AWAY_TEAM_LOGO").delete();
       }

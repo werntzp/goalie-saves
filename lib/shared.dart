@@ -24,7 +24,8 @@ class Summary {
   final Map<enumPeriodType, int> homeShots; 
   final Map<enumPeriodType, int> awayShots; 
   final List<Goal> goals;
+  final String homeTeam;
+  final String awayTeam;
 
-  Summary(this.homeShots, this.awayShots, this.goals);
-
+  Summary(this.homeShots, this.awayShots, this.goals, this.homeTeam, this.awayTeam);
 }
