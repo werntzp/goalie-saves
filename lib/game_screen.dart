@@ -174,6 +174,7 @@ class _GameScreenState extends State<GameScreen> {
   void _addHomeGoalExtra() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("period", _displayPeriod);
+    prefs.setString("scoring_team", "home");
  
     final result = await Navigator.push(
       context,
@@ -194,7 +195,8 @@ class _GameScreenState extends State<GameScreen> {
   void _addAwayGoalExtra() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("period", _displayPeriod);
- 
+    prefs.setString("scoring_team", "away");
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => GoalsScreen()),
@@ -226,7 +228,6 @@ class _GameScreenState extends State<GameScreen> {
   // cycle through values for the game period (1,2,3,OT, or SO)
   void _incrementPeriod() {
     setState(() {
-
       if (_period == enumPeriodType.one) {
         _period = enumPeriodType.two;
         _displayPeriod = "2";
@@ -247,6 +248,7 @@ class _GameScreenState extends State<GameScreen> {
         _period = enumPeriodType.one;
         _displayPeriod = "1";
       }
+
     });    
   }
 

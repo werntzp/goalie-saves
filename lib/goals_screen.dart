@@ -25,6 +25,22 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     setState(() {
       _displayPeriod = (prefs.getString("period") ?? "1");
+          if (_displayPeriod == "1") {
+            _goalPeriod = enumPeriodType.one;
+          }
+          else if (_displayPeriod == "2") {
+            _goalPeriod = enumPeriodType.two;
+          }
+          else if (_displayPeriod == "3") {
+            _goalPeriod = enumPeriodType.three;
+          }
+          else if (_displayPeriod == "OT") {
+            _goalPeriod = enumPeriodType.ot;
+          }
+          else {
+            _goalPeriod = enumPeriodType.so;
+          }
+
     });
 
   }
@@ -55,8 +71,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
       p = enumPeriodType.so;
     }
 
+    // decide whether this was goal for home or away 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    enumTeamType t = enumTeamType.home; 
+    if (prefs.getString("scoring_team") == "away") {
+      t = enumTeamType.away;
+    }
+
     // create a goal object to pass back  
-    Goal g = new Goal(_goalType, enumTeamType.home, _time, p);
+    Goal g = new Goal(_goalType, t, _time, p);
     Navigator.pop(context, g);
 
   }
