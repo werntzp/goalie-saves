@@ -7,16 +7,14 @@ import "package:path_provider/path_provider.dart";
 import "dart:io";
 import "shared.dart";
 
-class GameScreen extends StatefulWidget{
+class GameScreen extends StatefulWidget {
   GameScreen({Key key}) : super(key: key);
 
   @override
   _GameScreenState createState() => _GameScreenState();
-
 }
 
 class _GameScreenState extends State<GameScreen> {
-
   enumPeriodType _period = enumPeriodType.one;
   int _homeGoals = 0;
   int _awayGoals = 0;
@@ -24,30 +22,40 @@ class _GameScreenState extends State<GameScreen> {
   int _awayShots = 0;
   double _homeSvg = 100.00;
   double _awaySvg = 100.00;
-  String _homeDisplaySvg = "100.00"; 
-  String _awayDisplaySvg = "100.00"; 
+  String _homeDisplaySvg = "100.00";
+  String _awayDisplaySvg = "100.00";
   String _homeTeamName = "Team 1";
   String _awayTeamName = "Team 2";
   String _displayPeriod = "1";
   String _path = "";
-  Directory _directory; 
+  Directory _directory;
   File _homeLogoFile;
   File _awayLogoFile;
   List<Goal> _goals = <Goal>[];
   bool _isSwitched = false;
-  Map<enumPeriodType, int> _homeShotsMap = {enumPeriodType.one: 0, enumPeriodType.two: 0, enumPeriodType.three: 0, enumPeriodType.ot: 0, enumPeriodType.so: 0};
-  Map<enumPeriodType, int> _awayShotsMap = {enumPeriodType.one: 0, enumPeriodType.two: 0, enumPeriodType.three: 0, enumPeriodType.ot: 0, enumPeriodType.so: 0};
+  Map<enumPeriodType, int> _homeShotsMap = {
+    enumPeriodType.one: 0,
+    enumPeriodType.two: 0,
+    enumPeriodType.three: 0,
+    enumPeriodType.ot: 0,
+    enumPeriodType.so: 0
+  };
+  Map<enumPeriodType, int> _awayShotsMap = {
+    enumPeriodType.one: 0,
+    enumPeriodType.two: 0,
+    enumPeriodType.three: 0,
+    enumPeriodType.ot: 0,
+    enumPeriodType.so: 0
+  };
 
-  // don't get goals or shots go above 99 or below 0 
+  // don't get goals or shots go above 99 or below 0
   int restrictNumber(direction, counter) {
-
     if (direction == UP) {
       counter++;
       if (counter > 99) {
         counter = 99;
       }
-    }
-    else {
+    } else {
       counter--;
       if (counter < 0) {
         counter = 0;
@@ -56,7 +64,7 @@ class _GameScreenState extends State<GameScreen> {
     return counter;
   }
 
-  // clear out all the values 
+  // clear out all the values
   void _reset() {
     setState(() {
       // clear all the vars
@@ -67,7 +75,7 @@ class _GameScreenState extends State<GameScreen> {
       _homeSvg = 100.00;
       _awaySvg = 100.00;
       _homeDisplaySvg = "100.00";
-      _awayDisplaySvg = "100.00"; 
+      _awayDisplaySvg = "100.00";
       _period = enumPeriodType.one;
       _displayPeriod = "1";
       _goals.clear();
@@ -82,9 +90,7 @@ class _GameScreenState extends State<GameScreen> {
       _awayShotsMap[enumPeriodType.three] = 0;
       _awayShotsMap[enumPeriodType.ot] = 0;
       _awayShotsMap[enumPeriodType.so] = 0;
-
-    }
-    );    
+    });
   }
 
   // get a handle to the home team's logo
@@ -97,46 +103,60 @@ class _GameScreenState extends State<GameScreen> {
     return File("$_path/$AWAY_TEAM_LOGO");
   }
 
-  // if no custom logo, use default one for home team 
+  // if no custom logo, use default one for home team
   Widget _homeTeamLogo() {
     if (_homeLogoFile == null) {
-      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
+      return Image.asset(
+        "$DEFAULT_LOGO",
+        width: 100,
+        height: 100,
+      );
     } else {
       imageCache.clear();
-      return Image.file(_homeLogoFile, width: 100, height: 100,);
+      return Image.file(
+        _homeLogoFile,
+        width: 100,
+        height: 100,
+      );
     }
   }
 
-  // if no custom logo, use default one for away team 
+  // if no custom logo, use default one for away team
   Widget _awayTeamLogo() {
     if (_awayLogoFile == null) {
-      return Image.asset("$DEFAULT_LOGO", width: 100, height: 100,);
+      return Image.asset(
+        "$DEFAULT_LOGO",
+        width: 100,
+        height: 100,
+      );
     } else {
       imageCache.clear();
-      return Image.file(_awayLogoFile, width: 100, height: 100,);
+      return Image.file(
+        _awayLogoFile,
+        width: 100,
+        height: 100,
+      );
     }
   }
 
-  // load any custom details 
+  // load any custom details
   void _load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _directory = await getApplicationDocumentsDirectory();
     _path = _directory.path;
     String extra = "no";
 
-    // home team logo 
+    // home team logo
     if (await File("$_path/$HOME_TEAM_LOGO").exists() == true) {
       _homeLogoFile = await _getHomeTeamlogoFile;
-    }
-    else {
+    } else {
       _homeLogoFile = null;
     }
 
-    // away team logo 
+    // away team logo
     if (await File("$_path/$AWAY_TEAM_LOGO").exists() == true) {
       _awayLogoFile = await _getAwayTeamlogoFile;
-    }
-    else {
+    } else {
       _awayLogoFile = null;
     }
 
@@ -147,11 +167,10 @@ class _GameScreenState extends State<GameScreen> {
       // custom team names (if set)
       _homeTeamName = (prefs.getString("home_team_name") ?? "Team 1");
       _awayTeamName = (prefs.getString("away_team_name") ?? "Team 2");
-      // if asking for extra info, set boolean flag 
+      // if asking for extra info, set boolean flag
       if (extra == "yes") {
         _isSwitched = true;
-      }
-      else {
+      } else {
         _isSwitched = false;
       }
     });
@@ -170,18 +189,18 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  // instead of just incrementing goal, bring up screen to get more details about it 
+  // instead of just incrementing goal, bring up screen to get more details about it
   void _addHomeGoalExtra() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("period", _displayPeriod);
     prefs.setString("scoring_team", "home");
- 
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => GoalsScreen()),
     );
     if (result != null) {
-      setState(() {        
+      setState(() {
         _goals.add(result);
         _homeGoals = restrictNumber(UP, _homeGoals);
         if (_homeShots < _homeGoals) {
@@ -191,7 +210,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  // instead of just incrementing goal, bring up screen to get more details about it 
+  // instead of just incrementing goal, bring up screen to get more details about it
   void _addAwayGoalExtra() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("period", _displayPeriod);
@@ -202,7 +221,7 @@ class _GameScreenState extends State<GameScreen> {
       MaterialPageRoute(builder: (context) => GoalsScreen()),
     );
     if (result != null) {
-      setState(() {        
+      setState(() {
         _goals.add(result);
         _awayGoals = restrictNumber(UP, _awayGoals);
         if (_awayShots < _awayGoals) {
@@ -216,13 +235,15 @@ class _GameScreenState extends State<GameScreen> {
   void _gameSummary() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    Summary s = new Summary(_homeShotsMap, _awayShotsMap, _goals, prefs.getString("home_team_name"),prefs.getString("away_team_name"));
-    Navigator.push(context,
-      MaterialPageRoute(builder: (context) => SummaryScreen(
-           summary: s,
-        )),
-     );
-
+    Summary s = new Summary(_homeShotsMap, _awayShotsMap, _goals,
+        prefs.getString("home_team_name"), prefs.getString("away_team_name"));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SummaryScreen(
+                summary: s,
+              )),
+    );
   }
 
   // cycle through values for the game period (1,2,3,OT, or SO)
@@ -231,25 +252,20 @@ class _GameScreenState extends State<GameScreen> {
       if (_period == enumPeriodType.one) {
         _period = enumPeriodType.two;
         _displayPeriod = "2";
-      }
-      else if (_period == enumPeriodType.two) {
+      } else if (_period == enumPeriodType.two) {
         _period = enumPeriodType.three;
         _displayPeriod = "3";
-      }
-      else if (_period == enumPeriodType.three) {
+      } else if (_period == enumPeriodType.three) {
         _period = enumPeriodType.ot;
         _displayPeriod = "OT";
-      }
-      else if (_period == enumPeriodType.ot) {
+      } else if (_period == enumPeriodType.ot) {
         _period = enumPeriodType.so;
         _displayPeriod = "SO";
-      }
-      else {
+      } else {
         _period = enumPeriodType.one;
         _displayPeriod = "1";
       }
-
-    });    
+    });
   }
 
   // as goals or shots change, update the goalie's save percentage
@@ -259,14 +275,12 @@ class _GameScreenState extends State<GameScreen> {
 
     if (_awayShots == 0) {
       tmpAwayShots = 1;
-    }
-    else {
+    } else {
       tmpAwayShots = _awayShots;
     }
     if (_homeShots == 0) {
       tmpHomeShots = 1;
-    }
-    else {
+    } else {
       tmpHomeShots = _homeShots;
     }
 
@@ -274,7 +288,6 @@ class _GameScreenState extends State<GameScreen> {
     _homeDisplaySvg = _homeSvg.toStringAsFixed(2);
     _awaySvg = ((tmpHomeShots - _homeGoals) / tmpHomeShots) * 100.00;
     _awayDisplaySvg = _awaySvg.toStringAsFixed(2);
-
   }
 
   // function to go up or down in goals and shots
@@ -311,32 +324,30 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // decide what happens when they want to add a goal (simple or get extra info)
-  Widget _homeGoalsActionButton() {
+  void _addHomeGoal() {
     if (_isSwitched) {
-      return FloatingActionButton(heroTag: "fab1", onPressed: _addHomeGoalExtra, backgroundColor: Colors.black, tooltip: "Add Goal", mini: true, child: Icon(Icons.add));
+      _addHomeGoalExtra();
     } else {
-      return FloatingActionButton(heroTag: "fab1", onPressed: _addHomeGoalSimple, backgroundColor: Colors.black, tooltip: "Add Goal", mini: true, child: Icon(Icons.add));
+      _addHomeGoalSimple();
     }
   }
 
   // decide what happens when they want to add a goal (simple or get extra info)
-  Widget _awayGoalsActionButton() {
+  void _addAwayGoal() {
     if (_isSwitched) {
-      return FloatingActionButton(heroTag: "fab2", onPressed: _addAwayGoalExtra, backgroundColor: Colors.black, tooltip: "Add Goal", mini: true, child: Icon(Icons.add));
+      _addAwayGoalExtra();
     } else {
-      return FloatingActionButton(heroTag: "fab2", onPressed: _addAwayGoalSimple, backgroundColor: Colors.black, tooltip: "Add Goal", mini: true, child: Icon(Icons.add));
+      _addAwayGoalSimple();
     }
   }
 
-  // update number of shots or goals  
+  // update number of shots or goals
   void _update(enumTeamType who, int what, int direction) {
     setState(() {
-
       if ((who == enumTeamType.home) & (what == SHOTS)) {
         _homeShots = restrictNumber(direction, _homeShots);
         _homeShotsMap[_period] = _homeShotsMap[_period] + 1;
-      }
-      else if ((who == enumTeamType.home) & (what == GOALS)) {
+      } else if ((who == enumTeamType.home) & (what == GOALS)) {
         _homeGoals = restrictNumber(direction, _homeGoals);
         if (_homeShots < _homeGoals) {
           _homeShots = _homeGoals;
@@ -346,24 +357,20 @@ class _GameScreenState extends State<GameScreen> {
         if (direction == UP) {
           Goal g = new Goal(null, who, null, _period);
           _goals.add(g);
-        }
-        else {
+        } else {
           // start at end of list and remove last goal that is ours
           Iterable rev = _goals.reversed;
           for (Goal g in rev) {
             if (g.team == enumTeamType.home) {
               _goals.remove(g);
               break;
-            }    
+            }
           }
         }
-
-      }
-      else if ((who == enumTeamType.away) & (what == SHOTS)) {
+      } else if ((who == enumTeamType.away) & (what == SHOTS)) {
         _awayShots = restrictNumber(direction, _awayShots);
         _awayShotsMap[_period] = _awayShotsMap[_period] + 1;
-      }
-      else {
+      } else {
         _awayGoals = restrictNumber(direction, _awayGoals);
         if (_awayShots < _awayGoals) {
           _awayShots = _awayGoals;
@@ -374,20 +381,19 @@ class _GameScreenState extends State<GameScreen> {
         _goals.add(g);
       }
 
-      // always update the save percentage for both teams 
+      // always update the save percentage for both teams
       _updateSavePercentage();
-
     });
   }
 
-  // override the init function to see if there's a stored team name 
+  // override the init function to see if there's a stored team name
   @override
   void initState() {
     super.initState();
     _load();
   }
 
-  // main build function 
+  // main build function
   Widget build(BuildContext xcontext) {
     return new Scaffold(
       appBar: new AppBar(
@@ -395,184 +401,298 @@ class _GameScreenState extends State<GameScreen> {
         backgroundColor: Colors.black,
       ),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            Padding(padding: const EdgeInsets.all(15.0),),
-            IntrinsicHeight(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                Container(
-                  child: Text("Home", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 25),),
-                ),
-                Container(
-                  child: Text("Away", style: TextStyle(decoration: TextDecoration.underline, fontWeight: FontWeight.bold, fontSize: 25),),
-                ),
-                ],
-              ),
-            ),
-            Padding(padding: const EdgeInsets.all(10.0),),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                      child: Column(
-                        children: <Widget>[
-                          Text("$_homeTeamName", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-                          FittedBox(
-                            fit: BoxFit.fill,
-                            child: _homeTeamLogo(),
-                          ),
-                        ],
-                      ),
-                  ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: GestureDetector(
-                        onTap: _incrementPeriod,
-                      child: Column(
-                        children: <Widget>[
-                          Padding(padding: const EdgeInsets.all(25.0),),
-                          Text("Period", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                          Text("$_displayPeriod", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                      child: Column(
-                        children: <Widget>[
-                          Text("$_awayTeamName", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),),
-                          FittedBox(
-                            fit: BoxFit.fill,
-                            child: _awayTeamLogo(),
-                          ),
-                        ],
-                      ),
-                  ),
-                  ],
-                ),
-              ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Container(
-                        child: Center(
-                            child: Text("Goals", style: TextStyle(fontSize: 25)),
-                        ),
-                    ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Container(
-                            child: Row(children: <Widget>[
-                              GestureDetector(
-                                onLongPress: _decrementHomeGoals,
-                                child: Text("$_homeGoals", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 65),),
-                              ),
-                              _homeGoalsActionButton(),
-                            ],
-                          ), 
-                        ),                     
-                        Container(
-                            child: Row(children: <Widget>[
-                              GestureDetector(
-                                onLongPress: _decrementAwayGoals,
-                                child: Text("$_awayGoals", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 65),),
-                              ),
-                              _awayGoalsActionButton(),
-                            ],
-                          ),
-                        ),
-                    ], 
-                  ),
-                ],
-              ),
-            ),
-          Expanded(
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Container(
-                          child: Center(
-                            child: Text("Shots", style: TextStyle(fontSize: 20)),
-                          ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Container(
-                        child: Row(children: <Widget>[
-                          GestureDetector(
-                            onLongPress: _decrementHomeShots,
-                            child: Text("$_homeShots", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 45, color: Colors.black54),),
-                          ),
-                          FloatingActionButton(heroTag: "fab3", onPressed: _incrementHomeShots, backgroundColor: Colors.black54, tooltip: "Add Shot", mini: true, child: Icon(Icons.add)),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: Row(children: <Widget>[
-                          GestureDetector(
-                            onLongPress: _decrementAwayShots,
-                            child: Text("$_awayShots", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 45, color: Colors.black54),),
-                          ),
-                          FloatingActionButton(heroTag: "fab4", onPressed: _incrementAwayShots, backgroundColor: Colors.black54, tooltip: "Add Shot", mini: true, child: Icon(Icons.add)),
-                          ],
-                        ),
-                      ),
-                    ], 
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                       Column(
-                          children: <Widget>[
-                          Text("Goalie", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          Text("SVG%", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          Text("$_homeDisplaySvg", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          ],
-                        ),
-                       Column(
-                          children: <Widget>[
-                          Text("Goalie", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          Text("SVG%", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          Text("$_awayDisplaySvg", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),),
-                          ],
-                        ),                        
-                    ],
-                  ),
-                ],
-              ),
-            ),         
-            Padding(padding: const EdgeInsets.all(3.0),),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+          ),
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                FloatingActionButton(heroTag: "fab5", onPressed: _reset, backgroundColor: Colors.black, tooltip: "Reset", mini: true, child: Icon(Icons.delete)),
-                FloatingActionButton(heroTag: "fab6", onPressed: _gameSummary, backgroundColor: Colors.black, tooltip: "Game Summary", mini: true, child: Icon(Icons.view_list)),
-                FloatingActionButton(heroTag: "fab7", onPressed: _settings, backgroundColor: Colors.black, tooltip: "Settings", mini: true, child: Icon(Icons.settings)),
+                Container(
+                  child: Text(
+                    "Home",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25),
+                  ),
+                ),
+                Container(
+                  child: Text(
+                    "Away",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25),
+                  ),
+                ),
               ],
             ),
-            Padding(padding: const EdgeInsets.all(10.0),),
-          ]
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "$_homeTeamName",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 25),
+                      ),
+                      FittedBox(
+                        fit: BoxFit.fill,
+                        child: _homeTeamLogo(),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: GestureDetector(
+                    onTap: _incrementPeriod,
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(25.0),
+                        ),
+                        Text(
+                          "Period",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        Text(
+                          "$_displayPeriod",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "$_awayTeamName",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 25),
+                      ),
+                      FittedBox(
+                        fit: BoxFit.fill,
+                        child: _awayTeamLogo(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: Center(
+                        child: Text("Goals", style: TextStyle(fontSize: 25)),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onLongPress: _decrementHomeGoals,
+                            onTap: _addHomeGoal,
+                            child: Text(
+                              "$_homeGoals",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 65),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onLongPress: _decrementAwayGoals,
+                            onTap: _addAwayGoal,
+                            child: Text(
+                              "$_awayGoals",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 65),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: Center(
+                        child: Text("Shots", style: TextStyle(fontSize: 20)),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onLongPress: _decrementHomeShots,
+                            onTap: _incrementHomeShots,
+                            child: Text(
+                              "$_homeShots",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 45,
+                                  color: Colors.black54),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: <Widget>[
+                          GestureDetector(
+                            onLongPress: _decrementAwayShots,
+                            onTap: _incrementAwayShots,
+                            child: Text(
+                              "$_awayShots",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 45,
+                                  color: Colors.black54),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          "Goalie",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          "SVG%",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          "$_homeDisplaySvg",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          "Goalie",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          "SVG%",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          "$_awayDisplaySvg",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(3.0),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              FloatingActionButton(
+                  heroTag: "fab5",
+                  onPressed: _reset,
+                  backgroundColor: Colors.black,
+                  tooltip: "Reset",
+                  mini: true,
+                  child: Icon(Icons.delete)),
+              FloatingActionButton(
+                  heroTag: "fab6",
+                  onPressed: _gameSummary,
+                  backgroundColor: Colors.black,
+                  tooltip: "Game Summary",
+                  mini: true,
+                  child: Icon(Icons.view_list)),
+              FloatingActionButton(
+                  heroTag: "fab7",
+                  onPressed: _settings,
+                  backgroundColor: Colors.black,
+                  tooltip: "Settings",
+                  mini: true,
+                  child: Icon(Icons.settings)),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+          ),
+        ]),
       ),
     );
   }
