@@ -328,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      "Capture Goal Details",
+                      "Extra Goal Information",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
                     ),

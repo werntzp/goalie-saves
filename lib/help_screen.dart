@@ -1,10 +1,20 @@
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "dart:convert";
 import "shared.dart";
 import 'package:webview_flutter/webview_flutter.dart';
 
 class HelpScreen extends StatelessWidget {
   HelpScreen({Key key}) : super(key: key);
   WebViewController _controller;
+
+  // load up a local html page with help information
+  _loadHtmlFromAssets() async {
+    String fileText = await rootBundle.loadString('assets/help.html');
+    _controller.loadUrl(Uri.dataFromString(fileText,
+            mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
+        .toString());
+  }
 
   // main build function
   @override
@@ -14,27 +24,45 @@ class HelpScreen extends StatelessWidget {
           title: new Text(APP_TITLE),
           backgroundColor: Colors.black,
         ),
-        body: SingleChildScrollView(
+        body: Center(
             child: Container(
-          margin: const EdgeInsets.only(left: 20.0, right: 20.0),
+          margin: const EdgeInsets.only(left: 10.0, right: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(10.0),
+              ),
+              Center(
+                child: Text("How to Use Tendy Tracker",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                        fontSize: 25)),
               ),
               Container(
                 child: WebView(
-                  initialUrl: "https://www.google.com",
+                  initialUrl: "about:blank",
                   onWebViewCreated: (WebViewController webViewController) {
                     _controller = webViewController;
-                    //_loadHtmlFromAssets();
+                    _loadHtmlFromAssets();
                   },
                 ),
-                height: 425.0,
+                height: 400.0,
               ),
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(5.0),
+              ),
+              Center(
+                child: Text("$APP_TITLE",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ),
+              Center(
+                child: Text("$APP_VERSION", style: TextStyle(fontSize: 15)),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
               ),
               Center(
                 child: FittedBox(
@@ -47,15 +75,7 @@ class HelpScreen extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(2.0),
-              ),
-              Center(
-                child: Text("Version 1.0, September 2020",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(5.0),
               ),
               Center(
                 child: FloatingActionButton(
