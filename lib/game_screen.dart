@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import 'package:goaliesaves/summary_screen.dart';
 import "settings_screen.dart";
 import "goals_screen.dart";
+import "help_screen.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:path_provider/path_provider.dart";
 import "dart:io";
@@ -187,6 +188,14 @@ class _GameScreenState extends State<GameScreen> {
         _load();
       });
     }
+  }
+
+  // move to the help dialog page
+  void _help() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HelpScreen()),
+    );
   }
 
   // instead of just incrementing goal, bring up screen to get more details about it
@@ -667,26 +676,33 @@ class _GameScreenState extends State<GameScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               FloatingActionButton(
-                  heroTag: "fab5",
+                  heroTag: "fab1",
                   onPressed: _reset,
                   backgroundColor: Colors.black,
                   tooltip: "Reset",
                   mini: true,
                   child: Icon(Icons.delete)),
               FloatingActionButton(
-                  heroTag: "fab6",
+                  heroTag: "fab2",
                   onPressed: _gameSummary,
                   backgroundColor: Colors.black,
                   tooltip: "Game Summary",
                   mini: true,
                   child: Icon(Icons.view_list)),
               FloatingActionButton(
-                  heroTag: "fab7",
+                  heroTag: "fab3",
                   onPressed: _settings,
                   backgroundColor: Colors.black,
                   tooltip: "Settings",
                   mini: true,
                   child: Icon(Icons.settings)),
+              FloatingActionButton(
+                  heroTag: "fab4",
+                  onPressed: _help,
+                  backgroundColor: Colors.black,
+                  tooltip: "Help",
+                  mini: true,
+                  child: Icon(Icons.help)),
             ],
           ),
           Padding(
