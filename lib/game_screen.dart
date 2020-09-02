@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import 'package:goaliesaves/summary_screen.dart';
+import 'package:tendytracker/summary_screen.dart';
 import "settings_screen.dart";
 import "goals_screen.dart";
 import "help_screen.dart";
