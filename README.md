@@ -1,4 +1,4 @@
 # Tendy Tracker
 
-Android Flutter app to track saves and goals for hockey goalies.
+An Android Flutter app to track saves and goals for hockey goalies.
 
