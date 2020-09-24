@@ -49,7 +49,7 @@ class _GameScreenState extends State<GameScreen> {
     enumPeriodType.so: 0
   };
 
-  // don't get goals or shots go above 99 or below 0
+  // don't let goals or shots go above 99 or below 0
   int restrictNumber(direction, counter) {
     if (direction == UP) {
       counter++;
@@ -355,7 +355,11 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       if ((who == enumTeamType.home) & (what == SHOTS)) {
         _homeShots = restrictNumber(direction, _homeShots);
-        _homeShotsMap[_period] = _homeShotsMap[_period] + 1;
+        if (direction == UP) {
+          _homeShotsMap[_period] = _homeShotsMap[_period] + 1;
+        } else {
+          _homeShotsMap[_period] = _homeShotsMap[_period] - 1;
+        }
       } else if ((who == enumTeamType.home) & (what == GOALS)) {
         _homeGoals = restrictNumber(direction, _homeGoals);
         if (_homeShots < _homeGoals) {
@@ -378,7 +382,11 @@ class _GameScreenState extends State<GameScreen> {
         }
       } else if ((who == enumTeamType.away) & (what == SHOTS)) {
         _awayShots = restrictNumber(direction, _awayShots);
-        _awayShotsMap[_period] = _awayShotsMap[_period] + 1;
+        if (direction == UP) {
+          _awayShotsMap[_period] = _awayShotsMap[_period] + 1;
+        } else {
+          _awayShotsMap[_period] = _awayShotsMap[_period] - 1;
+        }
       } else {
         _awayGoals = restrictNumber(direction, _awayGoals);
         if (_awayShots < _awayGoals) {
