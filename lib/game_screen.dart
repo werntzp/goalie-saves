@@ -7,6 +7,7 @@ import "package:shared_preferences/shared_preferences.dart";
 import "package:path_provider/path_provider.dart";
 import "dart:io";
 import "shared.dart";
+import "package:intl/intl.dart";
 
 class GameScreen extends StatefulWidget {
   GameScreen({Key key}) : super(key: key);
@@ -435,6 +436,13 @@ class _GameScreenState extends State<GameScreen> {
                           fontWeight: FontWeight.bold,
                           fontSize: 25),
                     ),
+                  ),
+                ),
+                Container(
+                  child: Center(
+                    child: Text(DateFormat('MM/dd').format(DateTime.now()),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
                   ),
                 ),
                 Container(
