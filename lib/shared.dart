@@ -1,5 +1,5 @@
 const APP_TITLE = "Tendy Tracker";
-const APP_VERSION = "Version 1.0, September 2020";
+const APP_VERSION = "Version 1.1, January 2021";
 const DEFAULT_LOGO = "images/opp_logo.png";
 const SDS_LOGO = "images/sds_logo.png";
 const HOME_TEAM_LOGO = "home_logo.png";

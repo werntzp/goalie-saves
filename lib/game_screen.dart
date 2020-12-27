@@ -35,6 +35,7 @@ class _GameScreenState extends State<GameScreen> {
   File _awayLogoFile;
   List<Goal> _goals = <Goal>[];
   bool _isSwitched = false;
+  DateTime _gameDate = DateTime.now();
   Map<enumPeriodType, int> _homeShotsMap = {
     enumPeriodType.one: 0,
     enumPeriodType.two: 0,
@@ -404,6 +405,19 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void _changeDate() async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: _gameDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null && picked != _gameDate)
+      setState(() {
+        _gameDate = picked;
+      });
+  }
+
   // override the init function to see if there's a stored team name
   @override
   void initState() {
@@ -439,10 +453,13 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 ),
                 Container(
-                  child: Center(
-                    child: Text(DateFormat('MM/dd').format(DateTime.now()),
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: GestureDetector(
+                    onTap: _changeDate,
+                    child: Center(
+                      child: Text(DateFormat('MM/dd').format(_gameDate),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)),
+                    ),
                   ),
                 ),
                 Container(
